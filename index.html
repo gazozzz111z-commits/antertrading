@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Trend Signals</title>
+<meta name="description" content="Trend-following crypto &amp; gold signals on Telegram">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: ink-and-gold "trading desk" — a live breakout chart as the hero, then proof (real 3-year backtest), then the product, pricing and FAQ. */
+:root{
+  --paper:#F5F6F2; --panel:#FFFFFF; --ink:#101B2B; --muted:#5B6675; --line:#DCE0DA;
+  --gold:#A87A1F; --gold-soft:#F3E7C9; --up:#177A4E; --down:#B8392F; --band:#E7EBF1;
+  --chip:#EDF0EA; --wa:#1E8E52;
+  --f-display:"Alexandria","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:14px; --max:1120px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0B1320; --panel:#111C2C; --ink:#E9EDF3; --muted:#9AA6B6; --line:#233246;
+  --gold:#E0B454; --gold-soft:#2A2616; --up:#3DBE83; --down:#EE6A5E; --band:#17263A; --chip:#172437; --wa:#2FB36B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0B1320; --panel:#111C2C; --ink:#E9EDF3; --muted:#9AA6B6; --line:#233246;
+  --gold:#E0B454; --gold-soft:#2A2616; --up:#3DBE83; --down:#EE6A5E; --band:#17263A; --chip:#172437; --wa:#2FB36B; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:800}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0}
+a{color:inherit}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:600}
+[dir="rtl"] .eyebrow{letter-spacing:0}
+section{padding-block:72px}
+.lead{color:var(--muted);max-width:62ch;margin-top:12px}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:12px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;white-space:nowrap;font-family:var(--f-display);font-weight:800;font-size:1.1rem;text-decoration:none}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--ink);display:grid;place-items:center}
+.logo svg{width:20px;height:20px}
+.nav .sp{flex:1}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{border:0;background:transparent;color:var(--muted);font:600 .85rem var(--f-body);padding:6px 12px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:12px 18px;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer;font-family:var(--f-body);font-size:1rem;white-space:nowrap}
+.btn-main{background:var(--gold);color:#16120A}
+.btn-main:hover{filter:brightness(1.06)}
+.btn-ghost{border-color:var(--line);color:var(--ink);background:var(--panel)}
+.btn:focus-visible,.lang button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.nav .btn{padding:9px 14px;font-size:.92rem}
+@media (max-width:640px){.nav .btn-main span.long{display:none}}
+
+/* hero */
+.hero{padding-block:56px 40px}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(2rem,4.6vw,3.4rem);font-weight:800;letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.trial-note{margin-top:12px;font-size:.9rem;color:var(--muted)}
+.chartcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+.chartcard .top{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--muted);gap:8px;flex-wrap:wrap}
+.chartcard canvas{width:100%;height:auto;aspect-ratio:16/10;display:block;max-width:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:6px;vertical-align:-1px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:40px;border-block:1px solid var(--line)}
+.facts div{padding:18px 12px;min-width:0}
+.facts div+div{border-inline-start:1px solid var(--line)}
+.facts b{display:block;font-family:var(--f-num);font-size:1.6rem;font-weight:600}
+.facts span{color:var(--muted);font-size:.88rem}
+@media (max-width:860px){.hero-grid{grid-template-columns:1fr}.facts{grid-template-columns:repeat(2,1fr)}.facts div:nth-child(3){border-inline-start:0}.facts div:nth-child(n+3){border-top:1px solid var(--line)}}
+
+/* signal demo */
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.tg{background:var(--band);border-radius:18px;padding:18px;max-width:440px;justify-self:center;width:100%}
+.msg{background:var(--panel);border-radius:14px;padding:14px 16px;font-size:.93rem;line-height:1.7;box-shadow:0 1px 0 var(--line)}
+.msg .h{font-weight:700}
+.msg .row{display:flex;gap:8px}
+.msg .up{color:var(--up);font-weight:600}.msg .dn{color:var(--down);font-weight:600}
+.msg code{font-family:var(--f-num);background:var(--chip);padding:1px 6px;border-radius:6px}
+.tgbtn{margin-top:8px;background:var(--panel);border-radius:10px;text-align:center;padding:9px;font-size:.9rem;color:var(--gold);font-weight:600;border:1px solid var(--line)}
+.checks{display:grid;gap:14px;margin-top:22px;padding:0;list-style:none}
+.checks li{display:flex;gap:12px;align-items:flex-start}
+.checks svg{flex:none;margin-top:4px}
+@media (max-width:860px){.demo-grid{grid-template-columns:1fr}}
+
+/* features */
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+.feat article{padding:22px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);display:flex;flex-direction:column;gap:8px;min-width:0}
+.feat .ic{width:40px;height:40px;border-radius:10px;background:var(--gold-soft);display:grid;place-items:center;color:var(--gold)}
+.feat p{color:var(--muted);font-size:.95rem}
+@media (max-width:860px){.feat{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.feat{grid-template-columns:1fr}}
+
+/* proof */
+.proof{background:var(--panel);border-block:1px solid var(--line)}
+.proof-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:32px;margin-top:30px;align-items:start}
+.eqwrap{min-width:0}
+#eq{width:100%;height:auto;display:block}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.kpis div{padding:16px;min-width:0;border-bottom:1px solid var(--line)}
+.kpis div:nth-child(odd){border-inline-end:1px solid var(--line)}
+.kpis div:nth-last-child(-n+2){border-bottom:0}
+.kpis b{display:block;font-family:var(--f-num);font-size:1.45rem;font-weight:600}
+.kpis small{display:block;color:var(--muted);font-size:.82rem;line-height:1.4}
+.kpis .vs{font-size:.78rem;color:var(--muted);font-family:var(--f-num)}
+.years{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.years div{border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+@media (max-width:1000px){.years{grid-template-columns:repeat(2,1fr)}}
+.years b{font-family:var(--f-num);font-size:1.2rem;color:var(--up)}
+.years span{display:block;color:var(--muted);font-size:.8rem}
+.note{margin-top:18px;font-size:.85rem;color:var(--muted);border-inline-start:3px solid var(--gold);padding-inline-start:12px}
+@media (max-width:860px){.proof-grid{grid-template-columns:1fr}}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px;counter-reset:s}
+.steps div{padding-top:18px;border-top:2px solid var(--ink);min-width:0}
+.steps div::before{counter-increment:s;content:counter(s);font-family:var(--f-num);color:var(--gold);font-weight:600;display:block;margin-bottom:6px}
+.steps p{color:var(--muted);font-size:.95rem;margin-top:6px}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px;align-items:stretch}
+.plan{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:24px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.plan.best{border:2px solid var(--gold)}
+.plan .tag{align-self:flex-start;background:var(--gold-soft);color:var(--gold);font-size:.78rem;font-weight:600;border-radius:999px;padding:3px 10px}
+.plan .price{font-family:var(--f-num);font-size:2.3rem;font-weight:600}
+.plan .per{color:var(--muted);font-size:.9rem}
+.plan ul{padding:0;margin:6px 0 0;list-style:none;display:grid;gap:6px;color:var(--muted);font-size:.93rem}
+.plan .btn{justify-content:center;margin-top:auto}
+.pay{margin-top:16px;color:var(--muted);font-size:.9rem}
+@media (max-width:860px){.plans{grid-template-columns:1fr}}
+
+/* faq */
+.faq{margin-top:26px;display:grid;gap:10px;max-width:820px}
+.faq details{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px 18px}
+.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.faq summary::after{content:"+";color:var(--gold);font-family:var(--f-num)}
+.faq details[open] summary::after{content:"–"}
+.faq p{color:var(--muted);margin-top:10px}
+
+/* final cta + footer */
+.final{background:var(--ink);color:var(--paper);border-radius:22px;padding:40px 28px;display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap}
+.final p{color:color-mix(in srgb,var(--paper) 75%,transparent);margin-top:8px;max-width:52ch}
+footer{padding-block:36px 110px;color:var(--muted);font-size:.85rem}
+footer .wrap{display:grid;gap:10px}
+.wa-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.copy{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:3px 10px;font:500 .8rem var(--f-body);cursor:pointer}
+
+/* whatsapp float */
+.wa{position:fixed;inset-inline-end:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:10px;background:var(--wa);color:#fff;text-decoration:none;border-radius:999px;padding:10px 16px 10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-weight:600}
+.wa svg{width:26px;height:26px}
+.wa small{display:block;font-weight:500;opacity:.9;font-size:.72rem;line-height:1.1}
+.wa .t{line-height:1.2}
+@media (max-width:520px){.wa .t{display:none}.wa{padding:12px}}
+@media (prefers-reduced-motion:no-preference){.rise{animation:rise .6s ease both}@keyframes rise{from{transform:translateY(8px)}to{transform:none}}}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="main">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17l5-5 4 3 8-9" stroke="#E0B454" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6h5v5" stroke="#E0B454" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Trend Signals</span></a>
+    <span class="sp"></span>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="l-ar" data-l="ar">عربي</button>
+      <button type="button" id="l-en" data-l="en">EN</button>
+    </div>
+    <a class="btn btn-main" href="https://t.me/AnterTradingPro_bot" target="_blank" rel="noopener"><span data-t="nav_cta"></span></a>
+  </div>
+</nav>
+
+<main id="top">
+  <header class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="rise">
+          <p class="eyebrow" data-t="eyebrow"></p>
+          <h1 style="margin-top:12px" data-t="h1"></h1>
+          <p class="lead" data-t="hero_sub"></p>
+          <div class="cta">
+            <a class="btn btn-main" href="https://t.me/AnterTradingPro_bot" target="_blank" rel="noopener" data-t="cta_trial"></a>
+            <a class="btn btn-ghost" href="#proof" data-t="cta_proof"></a>
+          </div>
+          <p class="trial-note" data-t="trial_note"></p>
+        </div>
+        <figure class="chartcard" style="margin:0">
+          <div class="top"><span class="num">SOLUSDT · 4H</span><span data-t="chart_cap"></span></div>
+          <canvas id="hero" width="880" height="550" aria-label="Breakout example chart" role="img"></canvas>
+          <div class="legend">
+            <span><i style="background:var(--band);border:1px solid var(--line)"></i><span data-t="lg_ch"></span></span>
+            <span><i style="background:var(--up)"></i><span data-t="lg_entry"></span></span>
+            <span><i style="background:var(--down)"></i><span data-t="lg_stop"></span></span>
+            <span><i style="background:var(--gold)"></i><span data-t="lg_tp"></span></span>
+          </div>
+        </figure>
+      </div>
+      <div class="facts">
+        <div><b class="num">14,172</b><span data-t="f1"></span></div>
+        <div><b class="num">30 + 🥇</b><span data-t="f2"></span></div>
+        <div><b class="num">24/7</b><span data-t="f3"></span></div>
+        <div><b class="num">2.3×</b><span data-t="f4"></span></div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap demo-grid">
+      <div>
+        <p class="eyebrow" data-t="d_eyebrow"></p>
+        <h2 style="margin-top:10px" data-t="d_h"></h2>
+        <p class="lead" data-t="d_sub"></p>
+        <ul class="checks">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--up)"/></svg><span data-t="c1"></span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--up)"/></svg><span data-t="c2"></span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--up)"/></svg><span data-t="c3"></span></li>
+        </ul>
+      </div>
+      <div class="tg" aria-label="Telegram message example">
+        <div class="msg" data-t="msg"></div>
+        <div class="tgbtn" data-t="msg_btn"></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow" data-t="ft_eyebrow"></p>
+      <h2 style="margin-top:10px" data-t="ft_h"></h2>
+      <div class="feat">
+        <article><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l5-5 4 3 8-9"/><path d="M15 6h5v5"/></svg></span><h3 data-t="ft1"></h3><p data-t="ft1p"></p></article>
+        <article><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3 data-t="ft2"></h3><p data-t="ft2p"></p></article>
+        <article><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 12h2M13 12h2M9 16h2M13 16h2"/></svg></span><h3 data-t="ft3"></h3><p data-t="ft3p"></p></article>
+        <article><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></span><h3 data-t="ft4"></h3><p data-t="ft4p"></p></article>
+        <article><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19h16M7 16V9M12 16V5M17 16v-4"/></svg></span><h3 data-t="ft5"></h3><p data-t="ft5p"></p></article>
+        <article><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><h3 data-t="ft6"></h3><p data-t="ft6p"></p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof" id="proof">
+    <div class="wrap">
+      <p class="eyebrow" data-t="p_eyebrow"></p>
+      <h2 style="margin-top:10px" data-t="p_h"></h2>
+      <p class="lead" data-t="p_sub"></p>
+      <div class="proof-grid">
+        <div class="eqwrap">
+          <svg id="eq" viewBox="0 0 720 380" role="img" aria-label="Equity curve"></svg>
+          <div class="legend">
+            <span><i style="background:var(--gold)"></i><span data-t="lg_sys"></span></span>
+          </div>
+        </div>
+        <div>
+          <div class="kpis">
+            <div><b class="num" style="color:var(--up)">+21%</b><small data-t="k1"></small></div>
+            <div><b class="num" style="color:var(--down)">−13.4%</b><small data-t="k2"></small><span class="vs" data-t="k2v"></span></div>
+            <div><b class="num">1.27</b><small data-t="k3"></small><span class="vs" data-t="k3v"></span></div>
+            <div><b class="num">33%</b><small data-t="k4"></small></div>
+            <div><b class="num" style="color:var(--up)">+8.2%</b><small data-t="k5"></small></div>
+            <div><b class="num" style="color:var(--down)">−3.5%</b><small data-t="k6"></small></div>
+          </div>
+          <div class="years">
+            <div><b class="num">+24.3%</b><span data-t="y23"></span></div>
+            <div><b class="num">+27.9%</b><span>2024</span></div>
+            <div><b class="num">+0.7%</b><span>2025</span></div>
+            <div><b class="num">+10.7%</b><span data-t="y26"></span></div>
+          </div>
+        </div>
+      </div>
+      <p class="note" data-t="p_note"></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow" data-t="s_eyebrow"></p>
+      <h2 style="margin-top:10px" data-t="s_h"></h2>
+      <div class="steps">
+        <div><h3 data-t="s1"></h3><p data-t="s1p"></p></div>
+        <div><h3 data-t="s2"></h3><p data-t="s2p"></p></div>
+        <div><h3 data-t="s3"></h3><p data-t="s3p"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0" id="pricing">
+    <div class="wrap">
+      <p class="eyebrow" data-t="pr_eyebrow"></p>
+      <h2 style="margin-top:10px" data-t="pr_h"></h2>
+      <div class="plans">
+        <div class="plan"><h3 data-t="pl1"></h3><div><span class="price num">$20</span> <span class="per" data-t="per1"></span></div><ul data-t="pl_list"></ul><a class="btn btn-ghost" href="https://t.me/AnterTradingPro_bot" target="_blank" rel="noopener" data-t="pl_btn"></a></div>
+        <div class="plan best"><span class="tag" data-t="pl_best"></span><h3 data-t="pl2"></h3><div><span class="price num">$50</span> <span class="per" data-t="per2"></span></div><ul data-t="pl_list"></ul><a class="btn btn-main" href="https://t.me/AnterTradingPro_bot" target="_blank" rel="noopener" data-t="pl_btn"></a></div>
+        <div class="plan"><span class="tag" data-t="pl_save"></span><h3 data-t="pl3"></h3><div><span class="price num">$180</span> <span class="per" data-t="per3"></span></div><ul data-t="pl_list"></ul><a class="btn btn-ghost" href="https://t.me/AnterTradingPro_bot" target="_blank" rel="noopener" data-t="pl_btn"></a></div>
+      </div>
+      <p class="pay" data-t="pay"></p>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <p class="eyebrow" data-t="q_eyebrow"></p>
+      <h2 style="margin-top:10px" data-t="q_h"></h2>
+      <div class="faq" id="faq"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="final">
+        <div><h2 data-t="fin_h"></h2><p data-t="fin_p"></p></div>
+        <a class="btn btn-main" href="https://t.me/AnterTradingPro_bot" target="_blank" rel="noopener" data-t="cta_trial"></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="wa-line"><span data-t="ft_contact"></span> <span class="num" id="waNum">+20 102 522 4167</span> <button class="copy" type="button" id="copyBtn" data-t="copy"></button></div>
+    <p data-t="disclaimer"></p>
+    <p class="num">© 2026 Trend Signals</p>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/201025224167" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 32 32" fill="#fff" aria-hidden="true"><path d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 6.9L3 29l6.5-2c1.9 1 4.1 1.6 6.5 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.3c-2.1 0-4.1-.6-5.8-1.7l-.4-.2-3.9 1.2 1.2-3.7-.3-.4c-1.2-1.8-1.8-3.8-1.8-5.8C5 9.9 9.9 5.2 16 5.2S27 9.9 27 15.8 22.1 26.3 16 26.3zm6-7.8c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2-.2.3-.9 1.1-1.1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6l-1.1-2.6c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.7 5.8 5.1 2.9 1.1 3.5.9 4.1.8.6-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.1-.3-.2-.7-.4z"/></svg>
+  <span class="t"><span data-t="wa_t"></span><small class="num">01025224167</small></span>
+</a>
+
+<script>
+const SERIES={"d":["2023-10-01","2023-10-08","2023-10-15","2023-10-22","2023-10-29","2023-11-05","2023-11-12","2023-11-19","2023-11-26","2023-12-03","2023-12-10","2023-12-17","2023-12-24","2023-12-31","2024-01-07","2024-01-14","2024-01-21","2024-01-28","2024-02-04","2024-02-11","2024-02-18","2024-02-25","2024-03-03","2024-03-10","2024-03-17","2024-03-24","2024-03-31","2024-04-07","2024-04-14","2024-04-21","2024-04-28","2024-05-05","2024-05-12","2024-05-19","2024-05-26","2024-06-02","2024-06-09","2024-06-16","2024-06-23","2024-06-30","2024-07-07","2024-07-14","2024-07-21","2024-07-28","2024-08-04","2024-08-11","2024-08-18","2024-08-25","2024-09-01","2024-09-08","2024-09-15","2024-09-22","2024-09-29","2024-10-06","2024-10-13","2024-10-20","2024-10-27","2024-11-03","2024-11-10","2024-11-17","2024-11-24","2024-12-01","2024-12-08","2024-12-15","2024-12-22","2024-12-29","2025-01-05","2025-01-12","2025-01-19","2025-01-26","2025-02-02","2025-02-09","2025-02-16","2025-02-23","2025-03-02","2025-03-09","2025-03-16","2025-03-23","2025-03-30","2025-04-06","2025-04-13","2025-04-20","2025-04-27","2025-05-04","2025-05-11","2025-05-18","2025-05-25","2025-06-01","2025-06-08","2025-06-15","2025-06-22","2025-06-29","2025-07-06","2025-07-13","2025-07-20","2025-07-27","2025-08-03","2025-08-10","2025-08-17","2025-08-24","2025-08-31","2025-09-07","2025-09-14","2025-09-21","2025-09-28","2025-10-05","2025-10-12","2025-10-19","2025-10-26","2025-11-02","2025-11-09","2025-11-16","2025-11-23","2025-11-30","2025-12-07","2025-12-14","2025-12-21","2025-12-28","2026-01-04","2026-01-11","2026-01-18","2026-01-25","2026-02-01","2026-02-08","2026-02-15","2026-02-22","2026-03-01","2026-03-08","2026-03-15","2026-03-22","2026-03-29","2026-04-05","2026-04-12","2026-04-19","2026-04-26","2026-05-03","2026-05-10","2026-05-17","2026-05-24","2026-05-31","2026-06-07","2026-06-14","2026-06-21","2026-06-28","2026-07-05","2026-07-12","2026-07-19","2026-07-26","2026-08-02","2026-08-09","2026-08-16","2026-08-23","2026-08-30","2026-09-06","2026-09-13","2026-09-20","2026-09-27","2026-10-04"],"s":[1008.0,988.9,973.9,1012.3,1091.9,1138.3,1206.5,1179.8,1162.3,1167.1,1228.9,1206.3,1236.1,1243.4,1225.6,1232.6,1231.8,1225.3,1216.7,1243.0,1277.4,1274.0,1411.4,1418.8,1420.7,1412.6,1424.9,1407.1,1367.3,1359.3,1357.6,1348.0,1343.6,1342.1,1360.8,1349.4,1340.3,1316.5,1341.4,1328.8,1360.7,1338.6,1367.9,1336.2,1345.9,1345.6,1338.7,1336.2,1315.5,1308.9,1284.3,1299.7,1352.3,1315.2,1305.2,1324.1,1291.7,1283.6,1395.5,1475.2,1590.1,1620.6,1673.0,1645.4,1616.6,1590.8,1597.6,1572.0,1568.9,1562.2,1558.4,1553.0,1544.5,1535.1,1534.5,1534.3,1531.6,1524.9,1502.8,1503.5,1472.7,1460.5,1493.1,1482.9,1620.0,1569.0,1548.9,1533.2,1524.0,1522.3,1525.1,1505.0,1463.3,1574.2,1652.0,1639.3,1621.3,1615.4,1590.1,1573.6,1572.2,1560.9,1563.9,1554.4,1544.8,1555.2,1584.3,1598.9,1595.6,1578.7,1586.2,1597.7,1615.6,1610.9,1604.5,1606.5,1610.8,1605.9,1630.8,1617.8,1607.1,1628.4,1684.1,1725.2,1718.8,1719.9,1702.8,1683.6,1677.6,1659.2,1644.1,1625.7,1568.1,1567.9,1578.3,1558.0,1628.3,1579.2,1565.0,1574.3,1643.8,1636.5,1635.8,1644.7,1633.1,1615.5,1600.2,1596.5,1550.5,1532.5,1537.7,1778.5,1723.4,1755.1,1742.2,1759.5,1778.3,1771.8],"b":[1047.6,991.8,949.5,1035.6,1161.7,1267.9,1440.6,1419.7,1419.7,1462.2,1712.5,1695.3,1923.6,1971.4,1778.2,1934.6,1852.3,1840.0,1822.4,1992.5,2152.8,2220.9,2838.2,3117.1,3087.1,3072.3,3317.6,3053.8,2418.6,2535.0,2497.2,2558.1,2404.2,2507.1,2717.4,2622.9,2552.2,2399.9,2130.4,2228.2,1885.1,2184.1,2410.2,2240.8,1824.5,1826.5,1856.2,2129.5,1811.0,1834.7,1920.7,2106.4,2322.6,2146.0,2152.0,2315.2,2142.0,2024.9,2692.4,3112.3,3912.3,4423.9,5175.8,4852.5,3845.7,3833.4,4420.9,3927.6,4025.8,3904.5,3223.6,3005.1,3133.3,3116.2,3187.6,2454.1,2455.2,2585.6,2397.9,2091.6,2295.0,2333.5,2586.1,2464.7,3089.8,2959.8,2948.8,2715.3,2709.9,2641.0,2313.9,2652.7,2612.6,3092.1,3564.0,3521.4,3065.1,3461.4,3511.5,3529.0,3209.4,3279.9,3510.1,3454.3,3193.6,3384.2,2835.1,2612.1,2760.6,2629.7,2689.6,2322.6,2070.5,2098.8,2047.4,1962.9,1885.9,1918.5,2132.0,2082.9,2049.8,1831.6,1555.1,1427.9,1458.3,1388.8,1368.7,1333.7,1452.0,1358.6,1308.8,1355.5,1344.6,1398.9,1475.8,1439.7,1653.7,1473.3,1479.8,1490.8,1233.3,1272.7,1222.6,1152.5,1262.6,1230.1,1220.3,1252.3,1213.6,1199.5,1159.0,1480.5,1346.5,1566.3,1472.2,1745.1,1951.4,1898.0]};
+const T={
+ar:{
+nav_cta:'<span class="long">جرّب 3 أيام </span>مجاناً',
+eyebrow:'إشارات تداول على تليجرام · كريبتو ودهب',
+h1:'صفقات مدروسة بالأرقام، <em>ومتابعة لحد آخر دولار</em>',
+hero_sub:'نظام بيتبع الترند على فريم 4 ساعات، اتختبر على أكتر من 14 ألف صفقة في 3 سنين. بيبعتلك كل صفقة بالدخول والستوب والهدف، ويفضل يراقبها 24 ساعة، ويحسبلك مكسبك وخسارتك بفلوسك إنت.',
+cta_trial:'ابدأ تجربة 3 أيام مجاناً',
+cta_proof:'شوف النتايج',
+trial_note:'من غير أي دفع في التجربة. بعدها من 20$ في الشهر.',
+chart_cap:'مثال: كسر قناة 55 شمعة',
+lg_ch:'قناة السعر',lg_entry:'الدخول',lg_stop:'الستوب المتحرك',lg_tp:'الهدف الأول',
+f1:'صفقة اتختبرت في 3 سنين',f2:'عملة كريبتو + الدهب',f3:'مراقبة الصفقات المفتوحة',f4:'متوسط المكسب قد متوسط الخسارة',
+d_eyebrow:'شكل الصفقة',
+d_h:'كل حاجة محتاجها في رسالة واحدة',
+d_sub:'مفيش "ادخل دلوقتي" من غير خطة. كل صفقة جاية معاها سبب الدخول، ومكان الستوب، والهدف، وتاريخ الإشارة دي في الباك تست.',
+c1:'زرار تحت كل صفقة: اكتب دخلت بكام (ولو برافعة) ويقولك هتكسب كام عند الهدف وهتخسر كام عند الستوب.',
+c2:'تحذير لو الصفقة بدأت تمشي عكسك، وتنبيه أول ما الهدف يتضرب أو الترند يخلص.',
+c3:'تقرير يومي الساعة 9 بالليل بصفقاتك إنت بالدولار.',
+msg:'<div class="h">🚨 صفقة جديدة #214: SOLUSDT</div><div><span class="up">🟢 شراء</span> | ترند متوسط (55/20) | فريم 4 ساعات</div><br><div>💵 الدخول: <code>148.20</code></div><div>🛑 الستوب المتحرك: <code>139.60</code> (5.8%)</div><div>🎯 الهدف الأول: <code>174.00</code> (17.4%)</div><div>⚖️ لو الستوب اتضرب: <span class="dn">-5.9%</span> | عند الهدف: <span class="up">+17.3%</span></div><div>📊 الإشارة دي في الباك تست: 3,947 صفقة | متوسط المدة 3 أيام</div><div style="color:var(--muted);font-size:.8rem;margin-top:6px">مثال توضيحي لشكل الرسالة</div>',
+msg_btn:'💵 دخلت الصفقة دي؟ اكتب المبلغ واحسب مكسبك',
+ft_eyebrow:'ليه إحنا',
+ft_h:'مبني زي أنظمة صناديق الاستثمار، ومتقدّم بسيط زي رسالة واتساب',
+ft1:'نظام ترند متختبر',ft1p:'3 سرعات لكسر القنوات (20 و55 و100 شمعة)، زي الأنظمة اللي بتستخدمها صناديق الـ CTA من سنين. اتختبر على 30 عملة والدهب.',
+ft2:'متابعة 24 ساعة',ft2p:'البرنامج بيراقب كل صفقة مفتوحة كل دقيقة: يبلغك بالهدف، والستوب، ولو السوق اتقلب ضدك.',
+ft3:'حاسبة بفلوسك',ft3p:'اكتب المبلغ والرافعة، ويقولك النتيجة بالدولار، وينبهك لو الرافعة ممكن تصفّي حسابك قبل الستوب.',
+ft4:'فلتر حماية',ft4p:'ممنوع شراء العملات وBTC هابط، وممنوع البيع وBTC صاعد. وده من أهم أسباب إن أسوأ هبوط كان 13% بس.',
+ft5:'ذكاء اصطناعي بيتعلم',ft5p:'موديل ماشين ليرنينج بيقيّم كل صفقة، وبيعيد تدريب نفسه كل أسبوع على أحدث بيانات السوق.',
+ft6:'عربي وإنجليزي',ft6p:'البوت بيكلمك بلغتك، والصفقات بتوصل لحظة ما تتأكد، من غير تأخير.',
+p_eyebrow:'الأرقام',
+p_h:'نفس عائد السوق تقريباً، بسدس المخاطرة',
+p_sub:'لو كنت اشتريت كل العملات دي وسبتها 3 سنين، كان هيجيلك عائد قريب، بس كنت هتشوف فلوسك بتنزل 78% في النص. النظام جاب 21% في السنة، وأسوأ هبوط شافه 13.4%.',
+lg_sys:'النظام: محفظة 1,000$ بقت 1,772$ في 3 سنين',lg_bh:'شراء كل العملات والانتظار',
+k1:'متوسط العائد السنوي',k2:'أسوأ هبوط',k2v:'الشراء والانتظار: −78%',k3:'Sharpe (العائد مقابل المخاطرة)',k3v:'الشراء والانتظار: 0.66',k4:'نسبة الصفقات الكسبانة',k5:'متوسط الصفقة الكسبانة',k6:'متوسط الصفقة الخسرانة',
+y23:'2023 (آخر 3 شهور)',y26:'2026 (لحد سبتمبر)',
+p_note:'دي نتايج باك تست: محاكاة للنظام على بيانات السوق الحقيقية من سبتمبر 2023 لسبتمبر 2026، بعد عمولة 0.075% لكل عملية. مش ضمان للمستقبل. وسجل الصفقات الحقيقية بعد الإطلاق متاح لأي حد جوه البوت بأمر /performance، الكسبانة والخسرانة.',
+s_eyebrow:'البداية',s_h:'3 خطوات وتبدأ',
+s1:'افتح البوت',s1p:'ادخل على البوت في تليجرام، واختار لغتك، وخد 3 أيام تجربة مجاناً.',
+s2:'استلم الصفقات',s2p:'كل صفقة بتوصلك بالدخول والستوب والهدف. ادخلها من Binance أو أي منصة بتستخدمها.',
+s3:'سجّل فلوسك وتابع',s3p:'دوس زرار 💵 واكتب دخلت بكام، والبوت يحسبلك كل حاجة بالدولار لحد ما الصفقة تخلص.',
+pr_eyebrow:'الأسعار',pr_h:'اختار الباقة اللي تناسبك',
+pl1:'شهر',pl2:'3 شهور',pl3:'سنة',per1:'/ شهر',per2:'/ 3 شهور',per3:'/ سنة',
+pl_best:'الأكثر طلباً',pl_save:'وفّر 26%',
+pl_list:'<li>كل الصفقات: 30 عملة + الدهب</li><li>متابعة وتحذيرات 24 ساعة</li><li>حاسبة بفلوسك وتقرير يومي</li>',
+pl_btn:'ابدأ بالتجربة المجانية',
+pay:'الدفع بـ USDT عن طريق Binance Pay، والاشتراك بيتفعّل لوحده في خلال دقيقة. والتجديد بيتزوّد على الباقي من اشتراكك.',
+q_eyebrow:'أسئلة',q_h:'قبل ما تبدأ',
+faq:[
+['ليه نسبة الصفقات الكسبانة 33% بس؟','ده طبيعي في أنظمة الترند. الخسارة بتتقفل بدري وصغيرة (متوسطها −3.5%)، والكسبانة بتتساب تجري (متوسطها +8.2%، وفيه صفقات بتجيب أضعاف). فالكسبانة القليلة بتغطي الخسرانة وزيادة.'],
+['محتاج خبرة في التداول؟','لأ. الرسالة بتقولك تدخل فين، وتحط الستوب فين، وتقفل عند أنهي سعر. ولو مش متأكد من حاجة، الدعم على واتساب.'],
+['أبدأ بكام؟','ابدأ بمبلغ تستحمل تخسره. والحاسبة جوه البوت بتوريك مكسبك وخسارتك قبل ما تدخل. ولو هتستخدم رافعة، خليها صغيرة.'],
+['الصفقات بتيجي إمتى؟','بعد قفل كل شمعة 4 ساعات، يعني 6 مرات في اليوم. في اليوم العادي حوالي 5 صفقات، وفي أيام السوق بيتحرك جامد بتبقى أكتر بكتير.'],
+['أقدر ألغي؟','الاشتراك مش بيتجدد لوحده. لما المدة تخلص البوت يفكّرك، وإنت اللي تقرر تجدد ولا لأ.'],
+['هل النتايج مضمونة؟','لأ، ومحدش يقدر يضمن السوق. اللي بنضمنه إن كل صفقة متسجلة بوقتها وسعرها، والسجل الحقيقي مفتوح للكل.']],
+fin_h:'الترند الجاي ممكن يبدأ النهارده',
+fin_p:'جرّب 3 أيام من غير ما تدفع، وشوف بنفسك شكل الصفقات والمتابعة.',
+ft_contact:'للتواصل مع أحد ممثلي الخدمة على واتساب:',copy:'نسخ الرقم',copied:'اتنسخ',
+disclaimer:'التداول في العملات الرقمية والدهب فيه مخاطرة عالية، وممكن تخسر جزء من فلوسك أو كلها. المحتوى ده مش نصيحة استثمارية، والنتايج اللي فاتت مش ضمان للجاية. القرار في الآخر قرارك.',
+wa_t:'كلّمنا على واتساب'
+},
+en:{
+nav_cta:'<span class="long">Try 3 days </span>free',
+eyebrow:'Telegram trading signals · Crypto & Gold',
+h1:'Signals backed by numbers, <em>tracked down to the last dollar</em>',
+hero_sub:'A 4-hour trend-following system tested on more than 14,000 trades over 3 years. Every trade comes with entry, stop and target, is monitored around the clock, and your own profit and loss is calculated in dollars.',
+cta_trial:'Start a free 3-day trial',
+cta_proof:'See the results',
+trial_note:'No payment for the trial. Then from $20 a month.',
+chart_cap:'Example: 55-candle channel breakout',
+lg_ch:'Price channel',lg_entry:'Entry',lg_stop:'Trailing stop',lg_tp:'Target 1',
+f1:'trades tested over 3 years',f2:'crypto coins + gold',f3:'monitoring of open trades',f4:'average win vs average loss',
+d_eyebrow:'What a signal looks like',
+d_h:'Everything you need in one message',
+d_sub:'No "buy now" without a plan. Every trade includes the reason, the stop, the target and how this exact signal performed in the backtest.',
+c1:'A button under every trade: enter your amount (and leverage) and see what you make at the target and lose at the stop.',
+c2:'A warning when a trade starts moving against you, and an alert the moment the target is hit or the trend ends.',
+c3:'A daily report of your own trades in dollars.',
+msg:'<div class="h">🚨 New trade #214: SOLUSDT</div><div><span class="up">🟢 BUY</span> | Medium trend (55/20) | 4H</div><br><div>💵 Entry: <code>148.20</code></div><div>🛑 Trailing stop: <code>139.60</code> (5.8%)</div><div>🎯 Target 1: <code>174.00</code> (17.4%)</div><div>⚖️ If stopped: <span class="dn">-5.9%</span> | at target: <span class="up">+17.3%</span></div><div>📊 This signal in backtest: 3,947 trades | avg duration 3 days</div><div style="color:var(--muted);font-size:.8rem;margin-top:6px">Illustrative example of the message format</div>',
+msg_btn:'💵 Entered this trade? Enter your amount',
+ft_eyebrow:'Why us',
+ft_h:'Built like a fund\'s trend system, delivered as simply as a chat message',
+ft1:'A tested trend system',ft1p:'Three channel-breakout speeds (20, 55 and 100 candles), the same family of systems CTA funds have run for decades. Tested on 30 coins and gold.',
+ft2:'24/7 monitoring',ft2p:'Every open trade is checked every minute: target hits, stops, and warnings when the market turns against you.',
+ft3:'Your-money calculator',ft3p:'Enter amount and leverage to see results in dollars, with a warning if leverage could liquidate you before the stop.',
+ft4:'Protection filter',ft4p:'No alt longs while BTC is falling, no shorts while it is rising, a key reason the worst drawdown stayed near 13%.',
+ft5:'Machine learning that keeps learning',ft5p:'A model rates every trade and retrains itself every week on the latest market data.',
+ft6:'Arabic & English',ft6p:'The bot speaks your language, and trades arrive the moment they are confirmed.',
+p_eyebrow:'The numbers',
+p_h:'About the market\'s return, with a sixth of the risk',
+p_sub:'Buying all these coins and holding for 3 years returned a similar amount, but you would have watched your money drop 78% on the way. The system made 21% a year with a worst drawdown of 13.4%.',
+lg_sys:'System: $1,000 grew to $1,772 in 3 years',lg_bh:'Buy all coins and hold',
+k1:'Average annual return',k2:'Worst drawdown',k2v:'Buy & hold: −78%',k3:'Sharpe ratio (return vs risk)',k3v:'Buy & hold: 0.66',k4:'Winning trades',k5:'Average winning trade',k6:'Average losing trade',
+y23:'2023 (last 3 months)',y26:'2026 (to September)',
+p_note:'These are backtest results: a simulation of the system on real market data from September 2023 to September 2026, after a 0.075% fee per side. Not a guarantee of future results. The live record since launch is open to anyone inside the bot with /performance, winners and losers.',
+s_eyebrow:'Getting started',s_h:'Three steps',
+s1:'Open the bot',s1p:'Open the bot on Telegram, pick your language and get a free 3-day trial.',
+s2:'Receive trades',s2p:'Each trade arrives with entry, stop and target. Place it on Binance or any exchange you use.',
+s3:'Log your money, follow along',s3p:'Tap 💵, enter your amount, and the bot tracks everything in dollars until the trade closes.',
+pr_eyebrow:'Pricing',pr_h:'Pick your plan',
+pl1:'1 month',pl2:'3 months',pl3:'1 year',per1:'/ month',per2:'/ 3 months',per3:'/ year',
+pl_best:'Most popular',pl_save:'Save 26%',
+pl_list:'<li>Every trade: 30 coins + gold</li><li>24/7 monitoring and warnings</li><li>Money calculator and daily report</li>',
+pl_btn:'Start with the free trial',
+pay:'Pay in USDT via Binance Pay; your subscription activates automatically within a minute. Renewals are added to your remaining time.',
+q_eyebrow:'Questions',q_h:'Before you start',
+faq:[
+['Why is the win rate only 33%?','That is normal for trend following. Losses are cut early and small (avg −3.5%) while winners run (avg +8.2%, some return many times more). A few winners cover the losers and more.'],
+['Do I need trading experience?','No. The message tells you where to enter, where to put the stop and where to take profit. Support is on WhatsApp if you are unsure.'],
+['How much should I start with?','Only money you can afford to lose. The in-bot calculator shows your profit and loss before you enter. If you use leverage, keep it low.'],
+['When do trades arrive?','After every 4-hour candle closes, six times a day. A typical day has about 5 trades, many more on days when the market moves hard.'],
+['Can I cancel?','Subscriptions do not auto-renew. When yours is ending the bot reminds you, and you decide.'],
+['Are results guaranteed?','No, nobody can guarantee the market. What we guarantee is that every trade is recorded with its time and price, and the live record is public.']],
+fin_h:'The next trend could start today',
+fin_p:'Try it for 3 days without paying and see the signals and tracking for yourself.',
+ft_contact:'Talk to one of our representatives on WhatsApp:',copy:'Copy number',copied:'Copied',
+disclaimer:'Trading crypto and gold carries high risk and you can lose part or all of your money. This is not investment advice, and past results do not guarantee future results. The final decision is yours.',
+wa_t:'Chat on WhatsApp'
+}};
+let lang='ar';
+try{const s=localStorage.getItem('lang');if(s==='ar'||s==='en')lang=s;else if(!/^ar/i.test(navigator.language||''))lang='en';}catch(e){if(!/^ar/i.test(navigator.language||''))lang='en';}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function apply(l){
+  lang=l;const d=T[l];
+  document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.dataset.t;if(d[k]!==undefined)el.innerHTML=d[k]});
+  document.getElementById('faq').innerHTML=d.faq.map((q,i)=>`<details${i===0?' open':''}><summary>${q[0]}</summary><p>${q[1]}</p></details>`).join('');
+  document.getElementById('l-ar').setAttribute('aria-pressed',l==='ar');document.getElementById('l-en').setAttribute('aria-pressed',l==='en');
+  try{localStorage.setItem('lang',l)}catch(e){}
+  drawHero();drawEq();
+}
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>apply(b.dataset.l)));
+document.getElementById('copyBtn').addEventListener('click',async e=>{
+  const n='+201025224167';
+  try{await navigator.clipboard.writeText(n);e.target.textContent=T[lang].copied}
+  catch(err){const r=document.createRange();r.selectNodeContents(document.getElementById('waNum'));const s=getSelection();s.removeAllRanges();s.addRange(r)}
+});
+
+/* hero: a price path that ranges inside a 55-candle channel, then breaks out; entry, trailing stop and target drawn to scale */
+function drawHero(){
+  const c=document.getElementById('hero'),x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+  let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const N=90,p=[];let v=100;
+  for(let i=0;i<N;i++){
+    if(i<58){v+= (rnd()-.5)*3.2; v+= (100-v)*0.08;}
+    else{v+= (rnd()-.3)*3.4+0.9;}
+    const o=v,cl=v+(rnd()-.45)*2.4,h=Math.max(o,cl)+rnd()*1.6,l=Math.min(o,cl)-rnd()*1.6;p.push({o,cl,h,l});v=cl;
+  }
+  const lo=Math.min(...p.map(k=>k.l))-4,hi=Math.max(...p.map(k=>k.h))+10;
+  const pad={l:12,r:64,t:14,b:14},cw=(W-pad.l-pad.r)/N;
+  const Y=q=>pad.t+(hi-q)/(hi-lo)*(H-pad.t-pad.b), X=i=>pad.l+i*cw+cw/2;
+  const chHi=Math.max(...p.slice(10,58).map(k=>k.cl)),chLo=Math.min(...p.slice(10,58).map(k=>k.cl));
+  x.fillStyle=css('--band');x.fillRect(X(10)-cw/2,Y(chHi),(58-10)*cw,Y(chLo)-Y(chHi));
+  x.strokeStyle=css('--line');x.lineWidth=1;x.setLineDash([5,5]);
+  [chHi,chLo].forEach(q=>{x.beginPath();x.moveTo(X(10)-cw/2,Y(q));x.lineTo(X(58),Y(q));x.stroke()});x.setLineDash([]);
+  const up=css('--up'),dn=css('--down');
+  p.forEach((k,i)=>{const col=k.cl>=k.o?up:dn;x.strokeStyle=col;x.fillStyle=col;x.lineWidth=1.2;
+    x.beginPath();x.moveTo(X(i),Y(k.h));x.lineTo(X(i),Y(k.l));x.stroke();
+    const y1=Y(Math.max(k.o,k.cl)),y2=Y(Math.min(k.o,k.cl));x.fillRect(X(i)-cw*0.32,y1,cw*0.64,Math.max(1.5,y2-y1));});
+  let e=58;for(let i=58;i<N;i++){if(p[i].cl>chHi){e=i;break}}
+  const entry=p[e].cl,stop=Math.min(...p.slice(e-20,e).map(k=>k.cl)),tp=entry+3*(entry-stop);
+  const line=(q,col,dash,lab)=>{x.strokeStyle=col;x.lineWidth=2;x.setLineDash(dash);x.beginPath();x.moveTo(X(e),Y(q));x.lineTo(W-pad.r+4,Y(q));x.stroke();x.setLineDash([]);
+    x.fillStyle=col;x.font='600 20px "IBM Plex Mono",monospace';x.textAlign='left';x.textBaseline='middle';x.fillText(lab,W-pad.r+8,Y(q));};
+  line(tp,css('--gold'),[8,6],'TP1');line(stop,dn,[4,4],'SL');line(entry,up,[],'IN');
+  x.fillStyle=up;x.beginPath();x.arc(X(e),Y(entry),7,0,Math.PI*2);x.fill();
+}
+
+/* equity: weekly $1,000 portfolio, system vs buy-and-hold basket, one shared y scale */
+function drawEq(){
+  const s=document.getElementById('eq'),W=720,H=380,pl=54,pr=14,pt=14,pb=34;
+  const a=SERIES.s,n=a.length;
+  const lo=Math.floor(Math.min(...a)/250)*250,hi=Math.ceil(Math.max(...a)/250)*250;
+  const X=i=>pl+i/(n-1)*(W-pl-pr),Y=v=>pt+(hi-v)/(hi-lo)*(H-pt-pb);
+  const mu=css('--muted'),ln=css('--line'),gd=css('--gold');
+  let g='';
+  for(let v=lo;v<=hi;v+=250){g+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${ln}" stroke-width="1"/><text x="${pl-8}" y="${Y(v)}" fill="${mu}" font-size="14" font-family="IBM Plex Mono,monospace" text-anchor="end" dominant-baseline="middle">$${v.toLocaleString('en-US')}</text>`}
+  let lastY='';SERIES.d.forEach((d,i)=>{const y=d.slice(0,4);if(y!==lastY&&d.slice(5,7)==='01'||i===0){if(y!==lastY){g+=`<text x="${X(i)}" y="${H-10}" fill="${mu}" font-size="14" font-family="IBM Plex Mono,monospace" text-anchor="middle">${i===0?d.slice(0,7):y}</text>`;lastY=y}}});
+  const path=arr=>arr.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+  const area=path(a)+` L${X(n-1)} ${Y(lo)} L${X(0)} ${Y(lo)} Z`;
+  g+=`<path d="${area}" fill="${gd}" fill-opacity=".12"/>`;
+  g+=`<path d="${path(a)}" fill="none" stroke="${gd}" stroke-width="2.6"/>`;
+  g+=`<circle cx="${X(n-1)}" cy="${Y(a[n-1])}" r="5" fill="${gd}"/>`;
+  g+=`<text x="${X(n-1)-8}" y="${Y(a[n-1])-12}" fill="${gd}" font-size="13" font-weight="600" font-family="IBM Plex Mono,monospace" text-anchor="end">$${Math.round(a[n-1]).toLocaleString('en-US')}</text>`;
+  s.setAttribute('direction','ltr');s.innerHTML=g;
+}
+apply(lang);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{drawHero();drawEq()});
+new MutationObserver(()=>{drawHero();drawEq()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+</script>
+
+</body>
+</html>
